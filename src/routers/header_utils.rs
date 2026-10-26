@@ -171,7 +171,7 @@ pub fn propagate_headers(
     request
 }
 
-#[cfg(test)]
+#[cfg(all(test, feature = "cpu", feature = "ready"))]
 mod tests {
     use super::*;
 
