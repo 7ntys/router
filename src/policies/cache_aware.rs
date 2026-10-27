@@ -472,8 +472,16 @@ impl LoadBalancingPolicy for CacheAwarePolicy {
         })
     }
 
+    fn tracks_request_load(&self) -> bool {
+        true
+    }
+
     fn name(&self) -> &'static str {
         "cache_aware"
+    }
+
+    fn needs_cache_routing_key(&self) -> bool {
+        true
     }
 
     fn needs_request_text(&self) -> bool {
