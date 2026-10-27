@@ -1,3 +1,5 @@
+#![cfg(all(feature = "cpu", feature = "ready"))]
+
 use axum::{
     body::{to_bytes, Body},
     http::{HeaderMap, Request, StatusCode},
@@ -138,7 +140,7 @@ impl TestWorker {
         let app = Router::new()
             .route("/health", get(|| async { StatusCode::OK }))
             .route(
-                "/get_server_info",
+                "/v1/models",
                 get(move || {
                     let available = available.clone();
                     let queries = queries.clone();
@@ -149,7 +151,7 @@ impl TestWorker {
                         } else {
                             StatusCode::SERVICE_UNAVAILABLE
                         };
-                        (status, Json(json!({"model_id": "test"})))
+                        (status, Json(json!({"data": [{"id": "test"}]})))
                     }
                 }),
             )
@@ -697,7 +699,7 @@ async fn concurrent_discovery_reuses_the_model_registered_first() {
     let release = Arc::new(tokio::sync::Notify::new());
     let queries = Arc::new(AtomicUsize::new(0));
     let worker_app = Router::new().route(
-        "/get_server_info",
+        "/v1/models",
         get({
             let started = started.clone();
             let release = release.clone();
@@ -711,7 +713,7 @@ async fn concurrent_discovery_reuses_the_model_registered_first() {
                         release.notified().await;
                         (StatusCode::SERVICE_UNAVAILABLE, Json(json!({})))
                     } else {
-                        (StatusCode::OK, Json(json!({"model_id": "test"})))
+                        (StatusCode::OK, Json(json!({"data": [{"id": "test"}]})))
                     }
                 }
             }
